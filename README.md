@@ -1,5 +1,3 @@
----
-
 # Workshy - Field Service Management Application
 
 ## Overview
@@ -86,5 +84,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 - Special thanks to all the open-source libraries and frameworks used in this project.
 - Appreciation for the Android development community for continuous support and inspiration.
-
----
