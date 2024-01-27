@@ -1,0 +1,35 @@
+# Ignore keystore files
+*.jks
+
+# Ignore properties files (may contain API keys, secrets)
+*.properties
+
+# Ignore local database files
+*.db
+
+# Ignore JSON files (may contain sensitive information)
+*.json
+
+# Ignore generated files
+/build
+
+# Ignore all .iml files
+*.iml
+
+# Ignore gradle files
+.gradle
+
+# Ignore all files in .idea directory
+/.idea/
+
+# Ignore DS_Store files
+.DS_Store
+
+# Ignore all files in captures directory
+/captures
+
+# Ignore externalNativeBuild directory
+.externalNativeBuild
+
+# Ignore cxx directory
+.cxx
