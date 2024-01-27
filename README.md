@@ -33,8 +33,7 @@ managing field services, from scheduling and dispatching to invoicing and custom
   encryption and security measures.
 - **Serialization:** [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) for
   seamless JSON serialization/deserialization.
-- **Symbol Processing:
-  ** [KSP (Kotlin Symbol Processing)](https://kotlinlang.org/docs/ksp-overview.html) for efficient
+- **Symbol Processing:** [KSP (Kotlin Symbol Processing)](https://kotlinlang.org/docs/ksp-overview.html) for efficient
   code generation.
 
 ## Development Environment
