@@ -1,12 +1,10 @@
 package za.co.workshyelec.core.navigation
 
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
 import org.koin.dsl.module
 
 val NavigationModule = module {
-    factory<NavigationHandler> { (navigator: DestinationsNavigator) ->
-        NavigationHandlerImpl(
-            navigator
-        )
+    factory<NavigationHandler> { (navController: NavController) ->
+        NavigationHandlerImpl(navController)
     }
 }

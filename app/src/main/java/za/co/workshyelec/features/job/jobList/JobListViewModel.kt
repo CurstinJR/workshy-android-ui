@@ -1,30 +1,24 @@
 package za.co.workshyelec.features.job.jobList
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import za.co.workshyelec.core.api.ApiErrorUtils
+import za.co.workshyelec.core.common.BaseViewModel
 import za.co.workshyelec.core.common.UiState
+import za.co.workshyelec.core.navigation.NavigationEvent
+import za.co.workshyelec.features.destinations.JobDetailScreenDestination
 import za.co.workshyelec.features.job.JobApiClient
 import za.co.workshyelec.features.job.models.Job
 
-sealed class NavigationEvent {
-    data class NavigateToJobDetail(val jobId: String) : NavigationEvent()
-}
-
 class JobListViewModel(
     private val jobApiClient: JobApiClient
-) : ViewModel() {
+) : BaseViewModel() {
     private val _jobList = MutableStateFlow<UiState<List<Job>>>(UiState.None)
-    private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
 
     val jobList: StateFlow<UiState<List<Job>>> = _jobList.asStateFlow()
-    val navigationEvent = _navigationEvent.asSharedFlow()
 
     init {
         getJobList()
@@ -46,7 +40,9 @@ class JobListViewModel(
 
     fun onJobClicked(jobId: String) {
         viewModelScope.launch {
-            _navigationEvent.emit(NavigationEvent.NavigateToJobDetail(jobId))
+            emitNavigationEvent(
+                NavigationEvent.NavigateTo(JobDetailScreenDestination(jobId))
+            )
         }
     }
 }

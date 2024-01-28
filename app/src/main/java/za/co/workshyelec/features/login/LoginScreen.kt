@@ -17,18 +17,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import za.co.workshyelec.core.navigation.NavigationEvent
 import za.co.workshyelec.core.navigation.NavigationHandlerImpl
 
 @RootNavGraph(start = true)
@@ -36,22 +35,22 @@ import za.co.workshyelec.core.navigation.NavigationHandlerImpl
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = koinViewModel(),
-    navigator: DestinationsNavigator
+    navController: NavController,
 ) {
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
     val isFormValid by loginViewModel.isFormValid.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val navigationHandler = remember { NavigationHandlerImpl(navigator) }
 
-    // LaunchedEffect is a Composable that launches a suspend function (effect)
-    // when the provided keys change. In this case, the key is the loginViewModel.
+    // Initialize NavigationHandler with NavController
+    val navigationHandler = remember { NavigationHandlerImpl(navController) }
+
+    // Collect navigation events from the ViewModel
     LaunchedEffect(loginViewModel) {
-        // The collect function is called on the navigationEvent Flow from the loginViewModel.
-        // This function collects each value emitted by the Flow and applies the given action to it.
-        // In this case, the action is navigating to the directionDestination.
-        loginViewModel.navigationEvent.collect { directionDestination ->
-            navigationHandler.navigateTo(directionDestination)
+        loginViewModel.navigationEvent.collect { event ->
+            when (event) {
+                is NavigationEvent.NavigateTo -> navigationHandler.navigateTo(event.direction)
+                is NavigationEvent.GoBack -> navigationHandler.goBack()
+            }
         }
     }
 
@@ -86,9 +85,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = {
-                    coroutineScope.launch { loginViewModel.login() }
-                },
+                onClick = { loginViewModel.login() },
                 enabled = isFormValid
             ) {
                 Text("Login")

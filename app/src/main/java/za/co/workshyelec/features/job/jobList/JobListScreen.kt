@@ -15,14 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import za.co.workshyelec.core.common.handle
+import za.co.workshyelec.core.navigation.NavigationEvent
 import za.co.workshyelec.core.navigation.NavigationHandler
-import za.co.workshyelec.features.destinations.JobDetailScreenDestination
 import za.co.workshyelec.features.job.composables.JobCard
 
 @Composable
 fun JobListScreen(
-    navigationHandler: NavigationHandler,
     jobListViewModel: JobListViewModel = koinViewModel(),
+    navigationHandler: NavigationHandler
 ) {
     // Observe the job list from the ViewModel
     val state by jobListViewModel.jobList.collectAsState()
@@ -30,10 +30,8 @@ fun JobListScreen(
     LaunchedEffect(jobListViewModel) {
         jobListViewModel.navigationEvent.collect { event ->
             when (event) {
-                is NavigationEvent.NavigateToJobDetail -> {
-                    val direction = JobDetailScreenDestination(event.jobId)
-                    navigationHandler.navigateTo(direction)
-                }
+                is NavigationEvent.NavigateTo -> navigationHandler.navigateTo(event.direction)
+                is NavigationEvent.GoBack -> navigationHandler.goBack()
             }
         }
     }
