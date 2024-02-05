@@ -49,23 +49,23 @@ sealed class UiState<out T> {
  *
  * @param T The type of data this UI state can hold.
  * @param onNone Lambda function to be executed when the state is None.
- * @param onSuccess Lambda function to be executed when the state is Success. It takes the data as a parameter.
+ * @param onEmpty Lambda function to be executed when the state is Empty.
  * @param onLoading Lambda function to be executed when the state is Loading. It takes the progress as a parameter.
  * @param onError Lambda function to be executed when the state is Error. It takes the error message and exception as parameters.
- * @param onEmpty Lambda function to be executed when the state is Empty.
+ * @param onSuccess Lambda function to be executed when the state is Success. It takes the data as a parameter.
  */
 inline fun <T> UiState<T>.handle(
     onNone: () -> Unit = {},
-    onSuccess: (T) -> Unit = {},
+    onEmpty: () -> Unit = {},
     onLoading: (Int?) -> Unit = {},
     onError: (ApiErrorResponse, Exception?) -> Unit = { _, _ -> },
-    onEmpty: () -> Unit = {},
+    onSuccess: (T) -> Unit = {},
 ) {
     when (this) {
         is UiState.None -> onNone()
-        is UiState.Success -> onSuccess(data)
+        is UiState.Empty -> onEmpty()
         is UiState.Loading -> onLoading(progress)
         is UiState.Error -> onError(errorResponse, exception)
-        is UiState.Empty -> onEmpty()
+        is UiState.Success -> onSuccess(data)
     }
 }
