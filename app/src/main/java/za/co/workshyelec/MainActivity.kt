@@ -23,6 +23,7 @@ import za.co.workshyelec.features.destinations.LoginScreenDestination
 import za.co.workshyelec.ui.theme.WorkshyAndroidUITheme
 
 class MainActivity : ComponentActivity() {
+
     @OptIn(KoinExperimentalAPI::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

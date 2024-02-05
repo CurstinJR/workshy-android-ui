@@ -10,6 +10,7 @@ fun NavigationCollector(navigationHandler: NavigationHandler) {
             when (event) {
                 is NavigationEvent.NavigateTo -> navigationHandler.navigateTo(event.direction)
                 is NavigationEvent.GoBack -> navigationHandler.goBack()
+                is NavigationEvent.CurrentDestination -> navigationHandler.currentDestination()
             }
         }
     }

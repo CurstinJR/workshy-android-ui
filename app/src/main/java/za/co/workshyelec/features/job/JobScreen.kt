@@ -11,9 +11,9 @@ import za.co.workshyelec.features.job.jobList.JobListScreen
 @Destination
 @Composable
 fun JobScreen(navController: NavController) {
-    val navigationHandler = remember { NavigationHandlerImpl(navController) }
+    val navigationHandlerImpl = remember { NavigationHandlerImpl(navController) }
 
     BaseScreen(navController = navController) {
-        JobListScreen(navigationHandler = navigationHandler)
+        JobListScreen(navigationHandlerImpl = navigationHandlerImpl)
     }
 }

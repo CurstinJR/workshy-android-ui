@@ -1,10 +1,12 @@
 package za.co.workshyelec.features.job.jobList
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,48 +16,57 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
-import za.co.workshyelec.core.common.handle
-import za.co.workshyelec.core.navigation.NavigationEvent
-import za.co.workshyelec.core.navigation.NavigationHandler
+import za.co.workshyelec.core.common.UiState
+import za.co.workshyelec.core.navigation.NavigationHandlerImpl
 import za.co.workshyelec.features.job.composables.JobCard
 
 @Composable
 fun JobListScreen(
     jobListViewModel: JobListViewModel = koinViewModel(),
-    navigationHandler: NavigationHandler
+    navigationHandlerImpl: NavigationHandlerImpl
 ) {
     // Observe the job list from the ViewModel
-    val state by jobListViewModel.jobList.collectAsState()
+    val jobListState by jobListViewModel.jobList.collectAsState()
 
     LaunchedEffect(jobListViewModel) {
         jobListViewModel.navigationEvent.collect { event ->
-            when (event) {
-                is NavigationEvent.NavigateTo -> navigationHandler.navigateTo(event.direction)
-                is NavigationEvent.GoBack -> navigationHandler.goBack()
-            }
+            navigationHandlerImpl.handleNavigationEvent(event)
         }
     }
 
-    state.handle(
-        onSuccess = { jobList ->
+    when (val state = jobListState) {
+        is UiState.Loading -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is UiState.Success -> {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                itemsIndexed(jobList) { _, job ->
+                itemsIndexed(state.data) { _, job ->
                     JobCard(job = job) { jobId ->
                         jobListViewModel.onJobClicked(jobId)
                     }
                 }
             }
-        },
-        onError = { error, _ ->
-            Text(text = error.message, modifier = Modifier.padding(16.dp))
-        },
-        onEmpty = {
+        }
+
+        is UiState.Error -> {
+            Text(text = state.errorResponse.message, modifier = Modifier.padding(16.dp))
+        }
+
+        else -> {
             Text(text = "No jobs active", modifier = Modifier.padding(16.dp))
         }
-    )
+    }
 }

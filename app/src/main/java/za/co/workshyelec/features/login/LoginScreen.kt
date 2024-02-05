@@ -1,5 +1,6 @@
 package za.co.workshyelec.features.login
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +28,7 @@ import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import org.koin.androidx.compose.koinViewModel
-import za.co.workshyelec.core.navigation.NavigationEvent
+import za.co.workshyelec.core.navigation.AppNavigation
 import za.co.workshyelec.core.navigation.NavigationHandlerImpl
 
 @RootNavGraph(start = true)
@@ -37,20 +38,25 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = koinViewModel(),
     navController: NavController,
 ) {
-    val username by loginViewModel.username.collectAsState()
-    val password by loginViewModel.password.collectAsState()
-    val isFormValid by loginViewModel.isFormValid.collectAsState()
-
     // Initialize NavigationHandler with NavController
     val navigationHandler = remember { NavigationHandlerImpl(navController) }
+
+    val username by loginViewModel.username.collectAsState()
+    val password by loginViewModel.password.collectAsState()
+    val loginError by loginViewModel.loginError.collectAsState()
+    val isFormValid by loginViewModel.isFormValid.collectAsState()
 
     // Collect navigation events from the ViewModel
     LaunchedEffect(loginViewModel) {
         loginViewModel.navigationEvent.collect { event ->
-            when (event) {
-                is NavigationEvent.NavigateTo -> navigationHandler.navigateTo(event.direction)
-                is NavigationEvent.GoBack -> navigationHandler.goBack()
-            }
+            navigationHandler.handleNavigationEvent(event)
+        }
+    }
+
+    // Collect global navigation events
+    LaunchedEffect(Unit) {
+        AppNavigation.globalNavigationEvents.collect { event ->
+            navigationHandler.handleNavigationEvent(event)
         }
     }
 
@@ -81,6 +87,16 @@ fun LoginScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
+
+            // Display the error message if the login failed
+            if (loginError.isNotBlank()) {
+                Log.d("LoginScreen", "Login error: $loginError")
+                Text(
+                    text = loginError,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

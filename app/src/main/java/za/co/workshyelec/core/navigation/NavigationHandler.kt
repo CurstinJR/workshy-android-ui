@@ -17,6 +17,12 @@ interface NavigationHandler {
      * Navigate back in the application.
      */
     fun goBack()
+
+    /**
+     * Get the current destination of the application.
+     * @return The current destination of the application.
+     */
+    fun currentDestination(): String?
 }
 
 /**
@@ -33,7 +39,9 @@ class NavigationHandlerImpl(
      * @param direction The direction to navigate to.
      */
     override fun navigateTo(direction: Direction) {
-        navController.navigate(direction.route)
+        if (currentDestination() != direction.route) {
+            navController.navigate(direction.route)
+        }
     }
 
     /**
@@ -41,5 +49,24 @@ class NavigationHandlerImpl(
      */
     override fun goBack() {
         navController.navigateUp()
+    }
+
+    /**
+     * Get the current destination of the application.
+     * This function uses the NavController to retrieve the current destination's route.
+     * The route is a string that represents the unique identifier of a destination in the navigation graph.
+     *
+     * @return The route of the current destination. If there is no current destination, it returns null.
+     */
+    override fun currentDestination(): String? {
+        return navController.currentDestination?.route
+    }
+
+    fun handleNavigationEvent(event: NavigationEvent) {
+        when (event) {
+            is NavigationEvent.NavigateTo -> navigateTo(event.direction)
+            is NavigationEvent.GoBack -> goBack()
+            is NavigationEvent.CurrentDestination -> {}
+        }
     }
 }

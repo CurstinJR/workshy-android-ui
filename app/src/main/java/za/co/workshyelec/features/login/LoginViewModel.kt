@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import za.co.workshyelec.core.api.ApiResponse
 import za.co.workshyelec.core.auth.AuthApiClient
 import za.co.workshyelec.core.auth.UserSessionManager
 import za.co.workshyelec.core.common.BaseViewModel
@@ -20,9 +21,11 @@ class LoginViewModel(
 ) : BaseViewModel() {
     private val _username = MutableStateFlow("")
     private val _password = MutableStateFlow("")
+    private val _loginError = MutableStateFlow("")
 
     val username: StateFlow<String> = _username.asStateFlow()
     val password: StateFlow<String> = _password.asStateFlow()
+    val loginError: StateFlow<String> = _loginError.asStateFlow()
 
     // Validation logic as StateFlow
     val isFormValid = combine(_username, _password) { username, password ->
@@ -40,9 +43,18 @@ class LoginViewModel(
 
     fun login() {
         viewModelScope.launch {
-            authApiClient.login(_username.value, _password.value)
-            userSessionManager.setLoggedIn(true)
-            emitNavigationEvent(NavigationEvent.NavigateTo(HomeScreenDestination))
+            when (
+                val response = authApiClient.login(_username.value, _password.value)
+            ) {
+                is ApiResponse.Success -> {
+                    userSessionManager.setLoggedIn(true)
+                    emitNavigationEvent(NavigationEvent.NavigateTo(HomeScreenDestination))
+                }
+
+                is ApiResponse.Error -> {
+                    _loginError.value = response.error.message
+                }
+            }
         }
     }
 }
