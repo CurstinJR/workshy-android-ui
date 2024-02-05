@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -16,6 +17,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import za.co.workshyelec.composables.BaseScreen
 import za.co.workshyelec.core.common.UiState
+import za.co.workshyelec.core.navigation.NavigationHandlerImpl
 import za.co.workshyelec.features.job.composables.JobDetailBottomBar
 import za.co.workshyelec.features.job.composables.JobDetailTopBar
 
@@ -32,15 +34,20 @@ fun JobDetailScreen(
     jobDetailScreenArgs: JobDetailScreenArgs,
     jobDetailViewModel: JobDetailViewModel = koinViewModel { parametersOf(jobDetailScreenArgs.jobId) }
 ) {
+    val navigationHandler = remember { NavigationHandlerImpl(navController) }
+
     val jobDetailState by jobDetailViewModel.jobDetail.collectAsState()
 
     BaseScreen(
         navController = navController,
-        topBar = { JobDetailTopBar() },
+        topBar = {
+            JobDetailTopBar(
+                jobId = jobDetailScreenArgs.jobId,
+                onBackClick = { navigationHandler.goBack() }
+            )
+        },
         bottomBar = { JobDetailBottomBar() }
     ) {
-        Text(text = "Job Detail Screen")
-
         when (val state = jobDetailState) {
             is UiState.Loading -> {
                 Column(

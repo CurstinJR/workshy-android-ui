@@ -54,8 +54,8 @@ fun JobListScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 itemsIndexed(state.data) { _, job ->
-                    JobCard(job = job) { jobId ->
-                        jobListViewModel.onJobClicked(jobId)
+                    JobCard(job = job) {
+                        jobListViewModel.onJobClicked(job.id)
                     }
                 }
             }

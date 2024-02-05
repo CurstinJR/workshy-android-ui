@@ -17,7 +17,10 @@ import za.co.workshyelec.features.job.models.Job
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobCard(job: Job, onJobClick: (String) -> Unit) {
+fun JobCard(
+    job: Job,
+    onJobClick: () -> Unit
+) {
     OutlinedCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -26,7 +29,7 @@ fun JobCard(job: Job, onJobClick: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        onClick = { onJobClick(job.id) }
+        onClick = onJobClick
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
