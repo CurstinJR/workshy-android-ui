@@ -9,9 +9,7 @@ import za.co.workshyelec.composables.BaseScreen
 @Destination
 @Composable
 fun HomeScreen(navController: NavController) {
-    BaseScreen(
-        navController = navController,
-    ) {
+    BaseScreen(navController = navController) {
         Text(text = "Home Screen")
     }
 }

@@ -6,15 +6,16 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
-import io.ktor.http.Cookie
+import io.ktor.client.request.accept
+import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import za.co.workshyelec.core.auth.UserSessionManager
@@ -24,12 +25,12 @@ fun createHttpClient(
     onTokenRefresh: suspend () -> BearerTokens?
 ): HttpClient {
     return HttpClient {
-        expectSuccess = true
-
         defaultRequest {
             host = "10.0.2.2"
             port = 3000
             url { protocol = URLProtocol.HTTP }
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
         }
 
         install(Logging) {
@@ -37,17 +38,15 @@ fun createHttpClient(
             level = LogLevel.ALL
         }
 
-        install(HttpCookies) {
-            storage = ConstantCookiesStorage(
-                Cookie(
-                    name = "refreshToken",
-                    value = userSessionManager.getRefreshToken() ?: "",
-                    domain = "10.0.2.2"
-                )
-            )
-        }
+        install(HttpCookies)
 
-        install(HttpTimeout)
+        install(HttpTimeout) {
+            connectTimeoutMillis = 10_000
+
+            requestTimeoutMillis = 15_000
+
+            socketTimeoutMillis = 15_000
+        }
 
         install(ContentNegotiation) {
             json(
@@ -68,14 +67,7 @@ fun createHttpClient(
                     BearerTokens(accessToken, refreshToken)
                 }
 
-                refreshTokens {
-                    try {
-                        onTokenRefresh() ?: throw Exception("Token refresh failed")
-                    } catch (e: Exception) {
-                        // Handle exception or log error
-                        null
-                    }
-                }
+                refreshTokens { onTokenRefresh() }
             }
         }
     }

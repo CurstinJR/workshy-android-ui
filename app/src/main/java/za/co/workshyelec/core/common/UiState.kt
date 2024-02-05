@@ -32,7 +32,7 @@ sealed class UiState<out T> {
     /**
      * Represents an error state with a message and an optional exception.
      *
-     * @param message The error message.
+     * @param errorResponse The error message.
      * @param exception The exception associated with the error, if available.
      */
     data class Error(val errorResponse: ApiErrorResponse, val exception: Exception? = null) :

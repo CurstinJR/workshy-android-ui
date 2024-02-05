@@ -39,4 +39,9 @@ class UserSessionManager(context: Context) {
     fun isLoggedIn(): Boolean {
         return sharedPreferences.getBoolean("isLoggedIn", false)
     }
+
+    fun clearSession() {
+        // Clear all data from SharedPreferences
+        sharedPreferences.edit().clear().apply()
+    }
 }
