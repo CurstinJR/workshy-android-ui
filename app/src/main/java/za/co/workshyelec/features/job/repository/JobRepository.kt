@@ -9,4 +9,6 @@ class JobRepository(private val jobApiClient: JobApiClient) {
     suspend fun getJobList(): ApiResponse<PaginatedResponse<Job>> = jobApiClient.getJobList()
 
     suspend fun getJobDetail(jobId: String): ApiResponse<Job> = jobApiClient.getJobDetail(jobId)
+
+    suspend fun getJobActivityList(jobId: String) = jobApiClient.getJobActivityList(jobId)
 }

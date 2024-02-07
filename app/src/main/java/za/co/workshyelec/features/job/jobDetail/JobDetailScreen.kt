@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Button
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,7 +31,10 @@ import za.co.workshyelec.composables.CircularLoadingIndicator
 import za.co.workshyelec.core.common.UiState
 import za.co.workshyelec.core.common.handle
 import za.co.workshyelec.core.navigation.NavigationHandlerImpl
+import za.co.workshyelec.features.job.composables.ClientDetailCard
 import za.co.workshyelec.features.job.composables.JobDetailBottomBar
+import za.co.workshyelec.features.job.composables.JobDetailButton
+import za.co.workshyelec.features.job.composables.JobDetailCard
 import za.co.workshyelec.features.job.composables.JobDetailTopBar
 import za.co.workshyelec.features.job.models.Job
 
@@ -47,7 +53,9 @@ fun JobDetailScreen(
 ) {
     val navigationHandler = remember { NavigationHandlerImpl(navController) }
 
-    val jobDetailState by jobDetailViewModel.jobDetail.collectAsState()
+    val currentViewState by jobDetailViewModel.currentView.collectAsState()
+    // Observe the consolidated screen state
+    val screenState by jobDetailViewModel.screenState.collectAsState()
 
     BaseScreen(
         navController = navController,
@@ -59,13 +67,34 @@ fun JobDetailScreen(
         },
         bottomBar = { JobDetailBottomBar() }
     ) {
-        JobDetailScreenContent(state = jobDetailState)
+        JobDetailScreenContent(
+            state = screenState.jobDetail,
+            onDetailSelected = { view ->
+                jobDetailViewModel.setCurrentView(view)
+            }
+        )
+
+        when (currentViewState) {
+            JobDetailView.Detail -> {
+                DetailView(state = screenState)
+            }
+
+            JobDetailView.Activity -> {
+                JobActivityListView(activityListState = screenState.activityList)
+            }
+
+            else -> {}
+        }
     }
 }
 
 @Composable
-fun JobDetailScreenContent(state: UiState<Job>) {
+private fun JobDetailScreenContent(
+    state: UiState<Job>,
+    onDetailSelected: (JobDetailView) -> Unit
+) {
     val scrollState = rememberScrollState()
+    val views = listOf(JobDetailView.Detail, JobDetailView.Activity)
 
     state.handle(
         onNone = { Text(text = "No job detail") },
@@ -86,6 +115,7 @@ fun JobDetailScreenContent(state: UiState<Job>) {
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif,
+                style = MaterialTheme.typography.headlineMedium
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
@@ -96,52 +126,54 @@ fun JobDetailScreenContent(state: UiState<Job>) {
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 fontFamily = FontFamily.SansSerif,
+                style = MaterialTheme.typography.bodyLarge
             )
 
             Spacer(modifier = Modifier.padding(8.dp))
 
+            // Job Detail Views
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .horizontalScroll(scrollState)
             ) {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Button 1")
-                }
-
-                Spacer(modifier = Modifier.padding(4.dp))
-
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Button 2")
-                }
-
-                Spacer(modifier = Modifier.padding(4.dp))
-
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Button 3")
-                }
-
-                Spacer(modifier = Modifier.padding(4.dp))
-
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Button 4")
-                }
-
-                Spacer(modifier = Modifier.padding(4.dp))
-
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Button 5")
+                views.forEach { view ->
+                    JobDetailButton(label = view.label) {
+                        onDetailSelected(view)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.padding(8.dp))
+@Composable
+private fun DetailView(state: JobDetailScreenState) {
+    val jobDetailState = state.jobDetail
+    val clientDetailState = state.clientDetail
 
-            Text(
-                text = "Work Detail",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-            )
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        jobDetailState.let { state ->
+            when (state) {
+                is UiState.Success -> JobDetailCard(state.data)
+                // Handle other states (Loading, Error) as needed
+                else -> {}
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        clientDetailState.let { state ->
+            when (state) {
+                is UiState.Success -> ClientDetailCard(state.data)
+                // Handle other states (Loading, Error) as needed
+                else -> {}
+            }
         }
     }
 }

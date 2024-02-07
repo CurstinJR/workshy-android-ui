@@ -1,6 +1,7 @@
 package za.co.workshyelec.composables
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -11,29 +12,22 @@ import androidx.navigation.NavController
 fun BaseScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    topBar: @Composable (() -> Unit)? = null,
-    bottomBar: @Composable ((NavController) -> Unit)? = null,
-    content: @Composable () -> Unit
+    applyOuterPadding: Boolean = true,
+    topBar: @Composable() (() -> Unit)? = null,
+    bottomBar: @Composable() ((NavController) -> Unit)? = null,
+    content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = {
-            val bar = topBar ?: { PrimaryTopBar() }
-            bar()
-        },
-        bottomBar = {
-            val bar =
-                bottomBar ?: { navController -> PrimaryBottomBar(navController = navController) }
-            bar(navController)
-        }
+        topBar = topBar ?: { PrimaryTopBar() },
+        bottomBar = { bottomBar?.invoke(navController) ?: PrimaryBottomBar(navController) }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(
-                top = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding()
-            )
-        ) {
-            content()
+        if (applyOuterPadding) {
+            Column(modifier = Modifier.padding(innerPadding)) {
+                content(innerPadding)
+            }
+        } else {
+            content(innerPadding)
         }
     }
 }

@@ -7,6 +7,7 @@ import za.co.workshyelec.core.api.ApiResponse
 import za.co.workshyelec.core.common.PaginatedResponse
 import za.co.workshyelec.core.ktor.safeRequest
 import za.co.workshyelec.features.job.models.Job
+import za.co.workshyelec.features.job.models.JobActivity
 
 class JobApiClient(
     private val httpClient: HttpClient
@@ -21,4 +22,10 @@ class JobApiClient(
         url("/api/jobs/$jobId")
         method = HttpMethod.Get
     }
+
+    suspend fun getJobActivityList(jobId: String): ApiResponse<List<JobActivity>> =
+        httpClient.safeRequest {
+            url("/api/jobs/$jobId/activities")
+            method = HttpMethod.Get
+        }
 }

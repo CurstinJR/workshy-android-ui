@@ -10,5 +10,11 @@ val JobModule = module {
     single { JobApiClient(get()) }
     single { JobRepository(get()) }
     viewModel { JobListViewModel(get()) }
-    viewModel { (jobId: String) -> JobDetailViewModel(get(), jobId) }
+    viewModel { (jobId: String) ->
+        JobDetailViewModel(
+            jobId,
+            get(),
+            get()
+        )
+    }
 }

@@ -13,7 +13,9 @@ import za.co.workshyelec.features.job.jobList.JobListScreen
 fun JobScreen(navController: NavController) {
     val navigationHandlerImpl = remember { NavigationHandlerImpl(navController) }
 
-    BaseScreen(navController = navController) {
+    BaseScreen(
+        navController = navController,
+    ) {
         JobListScreen(navigationHandlerImpl = navigationHandlerImpl)
     }
 }
