@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrimaryTopBar() {
+fun WSPrimaryTopBar() {
     TopAppBar(
         title = {
             Text(text = "Workshy")

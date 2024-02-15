@@ -32,6 +32,7 @@ fun JobDetailTopBar(
                 text = jobId.uppercase(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleLarge,
             )
         },
         navigationIcon = {

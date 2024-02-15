@@ -1,6 +1,5 @@
 package za.co.workshyelec.features.login
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -90,7 +89,6 @@ fun LoginScreen(
 
             // Display the error message if the login failed
             if (loginError.isNotBlank()) {
-                Log.d("LoginScreen", "Login error: $loginError")
                 Text(
                     text = loginError,
                     color = Color.Red,

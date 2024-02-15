@@ -79,6 +79,8 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.auth)
     implementation(libs.kotlinx.serialization.json)
+    // Google Fonts
+    implementation(libs.ui.text.google.fonts)
 
     ksp(libs.compose.destinations.ksp)
 

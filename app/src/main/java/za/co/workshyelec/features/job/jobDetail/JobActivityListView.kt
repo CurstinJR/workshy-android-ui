@@ -1,8 +1,7 @@
 package za.co.workshyelec.features.job.jobDetail
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,26 +15,30 @@ import za.co.workshyelec.features.job.models.JobActivity
 fun JobActivityListView(
     activityListState: UiState<List<JobActivity>>
 ) {
-    activityListState.let { state ->
-        when (state) {
-            is UiState.Loading -> {
-                CircularLoadingIndicator()
-            }
+    Column(
+        modifier = Modifier.padding(top = 16.dp)
+    ) {
+        activityListState.let { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    CircularLoadingIndicator()
+                }
 
-            is UiState.Success -> {
-                LazyColumn {
-                    itemsIndexed(state.data) { _, activity ->
-                        JobActivityCard(jobActivity = activity)
+                is UiState.Success -> {
+                    Column {
+                        state.data.forEach { jobActivity ->
+                            JobActivityCard(jobActivity = jobActivity)
+                        }
                     }
                 }
-            }
 
-            is UiState.Error -> {
-                Text(text = state.errorResponse.message, modifier = Modifier.padding(16.dp))
-            }
+                is UiState.Error -> {
+                    Text(text = state.errorResponse.message, modifier = Modifier.padding(16.dp))
+                }
 
-            else -> {
-                Text(text = "No job activities", modifier = Modifier.padding(16.dp))
+                else -> {
+                    Text(text = "No job activities", modifier = Modifier.padding(16.dp))
+                }
             }
         }
     }

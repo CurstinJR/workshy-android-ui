@@ -2,4 +2,5 @@
     <string name="app_name">WorkshyAndroidUI</string>
     <string name="home_label">Home</string>
     <string name="jobs_label">Jobs</string>
+    <string name="profile_label">Profile</string>
 </resources>
