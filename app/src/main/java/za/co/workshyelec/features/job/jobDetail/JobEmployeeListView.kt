@@ -1,24 +1,27 @@
 package za.co.workshyelec.features.job.jobDetail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import za.co.workshyelec.composables.WSCircularLoadingIndicator
 import za.co.workshyelec.core.common.UiState
-import za.co.workshyelec.features.job.composables.JobActivityCard
-import za.co.workshyelec.features.job.models.JobActivity
+import za.co.workshyelec.features.job.composables.JobEmployeeCard
+import za.co.workshyelec.features.job.models.Employee
 
 @Composable
-fun JobActivityListView(
-    activityListState: UiState<List<JobActivity>>
+fun JobEmployeeListView(
+    employeeListState: UiState<List<Employee>>
 ) {
     Column(
         modifier = Modifier.padding(top = 16.dp)
     ) {
-        activityListState.let { state ->
+        employeeListState.let { state ->
             when (state) {
                 is UiState.Loading -> {
                     WSCircularLoadingIndicator()
@@ -26,8 +29,15 @@ fun JobActivityListView(
 
                 is UiState.Success -> {
                     Column {
-                        state.data.forEach { jobActivity ->
-                            JobActivityCard(jobActivity = jobActivity)
+                        Text(
+                            text = "Members",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        state.data.forEach { employee ->
+                            JobEmployeeCard(employee = employee)
                         }
                     }
                 }
@@ -37,7 +47,7 @@ fun JobActivityListView(
                 }
 
                 else -> {
-                    Text(text = "No job activities", modifier = Modifier.padding(16.dp))
+                    Text(text = "No job employees", modifier = Modifier.padding(16.dp))
                 }
             }
         }

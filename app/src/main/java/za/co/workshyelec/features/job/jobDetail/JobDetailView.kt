@@ -5,6 +5,7 @@ sealed class JobDetailView {
     data object Activity : JobDetailView()
     data object Workers : JobDetailView()
     data object Material : JobDetailView()
+    data object Employees : JobDetailView()
 }
 
 val JobDetailView.label: String
@@ -13,4 +14,5 @@ val JobDetailView.label: String
         JobDetailView.Activity -> "Activity"
         JobDetailView.Workers -> "Workers"
         JobDetailView.Material -> "Material"
+        JobDetailView.Employees -> "Employees"
     }

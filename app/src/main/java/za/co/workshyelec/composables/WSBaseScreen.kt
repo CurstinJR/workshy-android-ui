@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun BaseScreen(
+fun WSBaseScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     topBar: @Composable (() -> Unit)? = null,

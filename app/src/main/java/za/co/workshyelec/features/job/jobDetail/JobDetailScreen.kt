@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,8 +22,8 @@ import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import za.co.workshyelec.composables.BaseScreen
-import za.co.workshyelec.composables.CircularLoadingIndicator
+import za.co.workshyelec.composables.WSBaseScreen
+import za.co.workshyelec.composables.WSCircularLoadingIndicator
 import za.co.workshyelec.composables.button.AppShapes
 import za.co.workshyelec.composables.button.WSDynamicButton
 import za.co.workshyelec.core.common.UiState
@@ -51,7 +51,7 @@ fun JobDetailScreen(
     val currentViewState by jobDetailViewModel.currentView.collectAsState()
     val screenState by jobDetailViewModel.screenState.collectAsState()
 
-    BaseScreen(
+    WSBaseScreen(
         navController = navController,
         topBar = {
             JobDetailTopBar(
@@ -61,29 +61,32 @@ fun JobDetailScreen(
         },
         bottomBar = { JobDetailBottomBar() },
     ) {
-        LazyColumn {
-            item {
-                JobDetailScreenContent(
-                    state = screenState.jobDetail,
-                    currentView = currentViewState,
-                    onDetailSelected = { view ->
-                        jobDetailViewModel.setCurrentView(view)
-                    }
-                )
-            }
-
-            item {
-                when (currentViewState) {
-                    JobDetailView.Detail -> {
-                        DetailView(state = screenState)
-                    }
-
-                    JobDetailView.Activity -> {
-                        JobActivityListView(activityListState = screenState.activityList)
-                    }
-
-                    else -> {}
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+        ) {
+            JobDetailScreenContent(
+                state = screenState.jobDetail,
+                currentView = currentViewState,
+                onDetailSelected = { view ->
+                    jobDetailViewModel.setCurrentView(view)
                 }
+            )
+
+            when (currentViewState) {
+                JobDetailView.Detail -> {
+                    DetailView(state = screenState)
+                }
+
+                JobDetailView.Activity -> {
+                    JobActivityListView(activityListState = screenState.activityList)
+                }
+
+                JobDetailView.Employees -> {
+                    JobEmployeeListView(employeeListState = screenState.employeeList)
+                }
+
+                else -> {}
             }
         }
     }
@@ -95,15 +98,15 @@ private fun JobDetailScreenContent(
     currentView: JobDetailView,
     onDetailSelected: (JobDetailView) -> Unit
 ) {
-    val views = listOf(JobDetailView.Detail, JobDetailView.Activity)
+    val views = listOf(JobDetailView.Detail, JobDetailView.Activity, JobDetailView.Employees)
 
-    Column {
-        when (state) {
-            is UiState.Loading -> {
-                CircularLoadingIndicator()
-            }
+    when (state) {
+        is UiState.Loading -> {
+            WSCircularLoadingIndicator()
+        }
 
-            is UiState.Success -> {
+        is UiState.Success -> {
+            Column {
                 // Job name
                 Text(
                     text = state.data.name,
@@ -139,34 +142,40 @@ private fun JobDetailScreenContent(
                     }
                 }
             }
-
-            // TODO: Implement custom Error UI composable
-            is UiState.Error -> {
-                Text(text = state.errorResponse.message)
-            }
-
-            // TODO: Implement custom None UI composable
-            is UiState.None -> {
-                Text(text = "No job detail")
-            }
-
-            else -> {}
         }
+
+        // TODO: Implement custom Error UI composable
+        is UiState.Error -> {
+            Text(text = state.errorResponse.message)
+        }
+
+        // TODO: Implement custom None UI composable
+        is UiState.None -> {
+            Text(text = "No job detail")
+        }
+
+        else -> {}
     }
 }
 
 @Composable
 private fun DetailView(state: JobDetailScreenState) {
-    val jobDetailState = state.jobDetail
+    val jobDetailState = state.jobDetail to state.jobTypeDetail
     val clientDetailState = state.clientDetail
 
     Column(
         modifier = Modifier
             .padding(top = 16.dp)
     ) {
-        jobDetailState.let { state ->
-            when (state) {
-                is UiState.Success -> JobDetailCard(state.data)
+        jobDetailState.let { (jobDetail, jobTypeDetail) ->
+            when {
+                jobDetail is UiState.Success && jobTypeDetail is UiState.Success -> {
+                    JobDetailCard(
+                        job = jobDetail.data,
+                        jobType = jobTypeDetail.data
+                    )
+                }
+
                 // Handle other states (Loading, Error) as needed
                 else -> {}
             }

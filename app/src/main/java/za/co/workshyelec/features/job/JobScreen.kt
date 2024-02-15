@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import com.ramcosta.composedestinations.annotation.Destination
-import za.co.workshyelec.composables.BaseScreen
+import za.co.workshyelec.composables.WSBaseScreen
 import za.co.workshyelec.core.navigation.NavigationHandlerImpl
 import za.co.workshyelec.features.job.jobList.JobListScreen
 
@@ -13,7 +13,7 @@ import za.co.workshyelec.features.job.jobList.JobListScreen
 fun JobScreen(navController: NavController) {
     val navigationHandlerImpl = remember { NavigationHandlerImpl(navController) }
 
-    BaseScreen(
+    WSBaseScreen(
         navController = navController,
     ) {
         JobListScreen(navigationHandlerImpl = navigationHandlerImpl)
